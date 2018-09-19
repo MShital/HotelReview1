@@ -59,26 +59,33 @@ plt.show()
 
 
 #####################################
-pos_ls=[]
-df_pos=pd.read_csv('Positive_words.csv')
-for i in df_pos:
-    pos_ls=df_pos
 
+nouns
+
+
+    
+pos_ls=[]
+
+df_pos=pd.read_csv('Positive_words.csv')
+
+pos_adj=df_pos['abound'].values.tolist()
+    
+neg_adj=df_neg['abnormal'].values.tolist()
 
 df_neg=pd.read_csv('neg.csv')
 
 df_neg=pd.read_csv('neg.txt')
 
-comment_words1=''
-for comment_words in pos_ls:
-    comment_words1=comment_words1+comment_words+' '
+words1=''
+for nouns in pos_adj:
+    words1=words1+nouns+' '
     
-comment_words1
+words1
 
 wordcloud = WordCloud(width = 800, height = 800, 
                 background_color ='white', 
                 stopwords = stopwords, 
-                min_font_size = 10).generate(comment_words)
+                min_font_size = 10).generate(words1)
 
 plt.figure(figsize = (8, 8), facecolor = None) 
 plt.imshow(wordcloud) 
@@ -87,9 +94,35 @@ plt.tight_layout(pad = 0)
 plt.show() 
 
 
+##################for Negative words
+words1_neg=''
+comm=''
+for nouns in neg_adj:
+   # print(nouns)
+    if nouns==neg_adj:
+        print(nouns)
+        words1_neg=words1_neg+nouns+' '
+    
+    if nouns in lines:
+        comm=comm+lines+'  '
+        
+        
+if text == 'This is correct':
+    print("Correct")        
+        
+    
+words1_neg
 
+wordcloud = WordCloud(width = 800, height = 800, 
+                background_color ='white', 
+                stopwords = stopwords, 
+                min_font_size = 10).generate(words1_neg)
 
-
+plt.figure(figsize = (8, 8), facecolor = None) 
+plt.imshow(wordcloud) 
+plt.axis("off") 
+plt.tight_layout(pad = 0) 
+plt.show() 
 
 from nltk.corpus import sentiwordnet as swn
 
