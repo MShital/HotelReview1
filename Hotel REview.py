@@ -58,6 +58,42 @@ plt.tight_layout(pad = 0)
 plt.show() 
 
 
+#####################################
+pos_ls=[]
+df_pos=pd.read_csv('Positive_words.csv')
+for i in df_pos:
+    pos_ls=df_pos
+
+
+df_neg=pd.read_csv('neg.csv')
+
+df_neg=pd.read_csv('neg.txt')
+
+comment_words1=''
+for comment_words in pos_ls:
+    comment_words1=comment_words1+comment_words+' '
+    
+comment_words1
+
+wordcloud = WordCloud(width = 800, height = 800, 
+                background_color ='white', 
+                stopwords = stopwords, 
+                min_font_size = 10).generate(comment_words)
+
+plt.figure(figsize = (8, 8), facecolor = None) 
+plt.imshow(wordcloud) 
+plt.axis("off") 
+plt.tight_layout(pad = 0) 
+plt.show() 
+
+
+
+
+
+
+from nltk.corpus import sentiwordnet as swn
+
+
 ############++++++++++++++++Working+++++++++++++++++##############
 #############segreagte topics wise comments
 
