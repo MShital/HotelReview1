@@ -1,0 +1,300 @@
+---
+title: "Hote Review_temp"
+author: "LIL"
+date: "September 21, 2018"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+
+```{r cars, echo=FALSE}
+#https://www.r-bloggers.com/an-overview-of-keyword-extraction-techniques/
+library("tm")
+
+library(udpipe)
+
+rw=read.csv('HotelRw_csv.csv')
+
+rw_d=data.frame(rw)
+library(tm)
+myCorpus <- Corpus(VectorSource(rw_d$Review))
+#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+
+# remove URLs
+
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+
+#myCorpus<-Corpus(VectorSource(tolower(myCorpus)))
+
+myCorpus <- tm_map(myCorpus, content_transformer(removeURL))
+
+# remove anything other than English letters or space
+
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+
+myCorpus <- tm_map(myCorpus, content_transformer(removeNumPunct))
+
+
+myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+
+# remove stopwords
+
+
+#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+#stopwordlist<-c("r", "big","use", "see", "used", "via","https", "amp","will","this","also","first","call","till","cant","like","what","This","THIS")
+#line=gsub("#","",search.string)
+#write(line,file="D:/sales force/tweeter analysis/stopWords.csv",append=TRUE)
+
+#stopwordlist<-read.csv(choose.files(),header = FALSE,sep = ",")
+
+stopwordlist<-read.csv(file="D:/sales force/tweeter analysis/stopWords.csv",header = FALSE,sep = ",")
+
+myStopwords <- c(setdiff(stopwords('english'), c("r", "big")),"use", "see", "used", "via","https", "amp","will","this","also","first","modi","rahul","jhasanjay")
+
+#########
+########
+#myStopwords <- c(setdiff(stopwords('english'),search_text))
+
+myStopwords1<-unlist(myStopwords)
+
+stopwordlist<-unlist(stopwordlist)
+
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords1)
+
+#myCorpus <- tm_map(myCorpus, removeWords, stopwordlist)
+
+
+#myStopwords <- c(stopwords('english'), stopwordlist)
+#myStopwords<-unlist(myStopwords)
+
+
+#myStopwords<-unlist(myStopwords)
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+#myCorpus <- tm_map(myCorpus, removeWords, "khairatabad")
+
+myCorpus <- tm_map(myCorpus, removeWords, c("this","will"))
+myCorpus <- tm_map(myCorpus, removeWords, c("must","Must","MUST","bjp","Bjp","BJP"))
+
+# remove extra whitespace
+
+
+myCorpus <- tm_map(myCorpus, stripWhitespace)
+
+
+# keep a copy for stem completion later
+
+myCorpusCopy <- myCorpus
+
+##To Avoid incomplete words dnt run following command
+
+#docs <- tm_map(docs, PlainTextDocument)  # needs to come before stemming
+#docs <- tm_map(docs, stemDocument, "english")
+
+
+
+#myCorpus <- tm_map(myCorpus, stemDocument)
+
+head(myCorpus)
+
+#install.packages("SnowballC")
+library(SnowballC)
+##Minimum word length is 3 charactes
+tdm <- TermDocumentMatrix(myCorpus,control = list(wordLengths = c(4, Inf)))
+
+#head(tdm)
+#install.packages("wordcloud")
+
+library(wordcloud)
+
+m <- as.matrix(tdm)
+
+# calculate the frequency of words and sort it by frequency
+
+
+word.freq <- sort(rowSums(m), decreasing = T)
+
+#wordcloud(words = names(word.freq), freq = word.freq,scale=c(4,.5), min.freq = 5,  random.order = F)
+
+wordcloud(words = names(word.freq), freq = word.freq,scale=c(4,.5), min.freq = 5,  random.order = F,colors=brewer.pal(6, "Dark2"))
+
+
+
+##service
+
+rw_d=data.frame(rw)
+head(rw)
+
+
+i=1
+j=1
+sel_rw=list()
+like=list()
+for(i in 1:nrow(rw)){
+  if( length(grep("service",toString(tolower(rw[i,1])),value=FALSE))==0)next
+  sel_rw[j]=toString(tolower(rw[i,1]))
+  like[j]=(rw[i,2])
+  #print(toString(res[i,1]))
+  j=j+1
+}
+
+xv <- data.frame(cbind("review" =sel_rw,"like"=like))
+
+myCorpus <- Corpus(VectorSource(xv$review))
+#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+
+# remove URLs
+
+removeURL <- function(x) gsub("http[^[:space:]]*", "", x)
+
+#myCorpus<-Corpus(VectorSource(tolower(myCorpus)))
+
+myCorpus <- tm_map(myCorpus, content_transformer(removeURL))
+
+# remove anything other than English letters or space
+
+removeNumPunct <- function(x) gsub("[^[:alpha:][:space:]]*", "", x)
+
+myCorpus <- tm_map(myCorpus, content_transformer(removeNumPunct))
+
+
+myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+
+# remove stopwords
+
+
+#myCorpus <- tm_map(myCorpus, content_transformer(tolower))
+#stopwordlist<-c("r", "big","use", "see", "used", "via","https", "amp","will","this","also","first","call","till","cant","like","what","This","THIS")
+#line=gsub("#","",search.string)
+#write(line,file="D:/sales force/tweeter analysis/stopWords.csv",append=TRUE)
+
+#stopwordlist<-read.csv(choose.files(),header = FALSE,sep = ",")
+
+stopwordlist<-read.csv(file="D:/sales force/tweeter analysis/stopWords.csv",header = FALSE,sep = ",")
+
+myStopwords <- c(setdiff(stopwords('english'), c("r", "big")),"use", "see", "used", "via","https", "amp","will","this","also","first","modi","rahul","jhasanjay")
+
+#########
+########
+#myStopwords <- c(setdiff(stopwords('english'),search_text))
+
+myStopwords1<-unlist(myStopwords)
+
+stopwordlist<-unlist(stopwordlist)
+
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords1)
+
+#myCorpus <- tm_map(myCorpus, removeWords, stopwordlist)
+
+
+#myStopwords <- c(stopwords('english'), stopwordlist)
+#myStopwords<-unlist(myStopwords)
+
+
+#myStopwords<-unlist(myStopwords)
+myCorpus <- tm_map(myCorpus, removeWords, myStopwords)
+#myCorpus <- tm_map(myCorpus, removeWords, "khairatabad")
+
+myCorpus <- tm_map(myCorpus, removeWords, c("this","will"))
+myCorpus <- tm_map(myCorpus, removeWords, c("must","Must","MUST","bjp","Bjp","BJP"))
+
+# remove extra whitespace
+
+
+myCorpus <- tm_map(myCorpus, stripWhitespace)
+
+
+# keep a copy for stem completion later
+
+myCorpusCopy <- myCorpus
+
+##To Avoid incomplete words dnt run following command
+
+#docs <- tm_map(docs, PlainTextDocument)  # needs to come before stemming
+#docs <- tm_map(docs, stemDocument, "english")
+
+
+
+#myCorpus <- tm_map(myCorpus, stemDocument)
+
+head(myCorpus)
+
+#install.packages("SnowballC")
+library(SnowballC)
+##Minimum word length is 3 charactes
+tdm <- TermDocumentMatrix(myCorpus,control = list(wordLengths = c(4, Inf)))
+
+#head(tdm)
+#install.packages("wordcloud")
+
+library(wordcloud)
+
+m <- as.matrix(tdm)
+str(tdm)
+# calculate the frequency of words and sort it by frequency
+
+
+word.freq <- sort(rowSums(m), decreasing = T)
+
+wordcloud(words = names(word.freq), freq = word.freq,scale=c(4,.5), min.freq = 2,  random.order = F)
+
+wordcloud(words = names(word.freq), freq = word.freq,scale=c(4,.5), min.freq = 2,  random.order = F,colors=brewer.pal(6, "Dark2"))
+
+
+#udmodel <- udpipe_download_model(language = "english")
+#udmodel <- udpipe_load_model(file = udmodel$file_model)
+#x <- udpipe_annotate(udmodel,  x = "The economy is weak but the outlook is bright")
+#x <- as.data.frame(x)
+#stats <- subset(x, upos %in% "NOUN")
+#stats
+#x
+##for complete reviews
+i=1
+rw_txt=""
+for (i in 1:nrow(xv)){
+  rw_txt=paste(rw_txt, xv[i,1])
+}
+#udmodel$file_model
+#udmodel <- udpipe_download_model(language = "english")
+udmodel <- udpipe_load_model(file = "E://GitHub//HotelReview//english-ud-2.0-170801.udpipe")
+#udmodel <- udpipe_load_model(file = udmodel$file_model)
+x <- udpipe_annotate(udmodel,  x = rw_txt)
+x <- as.data.frame(x)
+stats <- subset(x, upos %in% "NOUN")
+stats
+x
+stats <- subset(x, upos %in% "NOUN")
+stats <- txt_freq(x = stats$lemma)
+
+library(lattice)
+stats$key <- factor(stats$key, levels = rev(stats$key))
+barchart(key ~ freq, data = head(stats, 30), col = "cadetblue", main = "Most occurring nouns", xlab = "Freq")
+
+###Most Occuring Adjective
+stats <- subset(x, upos %in% "NOUN")
+stats
+x
+stats <- subset(x, upos %in% "ADJ")
+stats <- txt_freq(x = stats$lemma)
+
+library(lattice)
+stats$key <- factor(stats$key, levels = rev(stats$key))
+barchart(key ~ freq, data = head(stats, 30), col = "cadetblue", main = "Most occurring Adjective", xlab = "Freq")
+
+
+
+stats <- cooccurrence(x = x$lemma, 
+                      relevant = x$upos %in% c("NOUN", "ADJ"), skipgram = 2)
+#stats
+```
+
+
+
