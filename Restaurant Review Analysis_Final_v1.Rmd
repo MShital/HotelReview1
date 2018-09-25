@@ -1,7 +1,7 @@
 ---
-title: "Restaurant Reviews Analysis"
+title: "Restaurant Review Analysis"
 author: "LIL"
-date: "September 24, 2018"
+date: "September 25, 2018"
 output: word_document
 ---
 
@@ -12,10 +12,103 @@ knitr::opts_chunk$set(
 	warning = FALSE
 )
 ```
+## Restaurant User Review Analysis
 
-## Hotel Review
+## Natural Language Processing
+This report is about the analysis of Restaurant review received by a user after availing the service.
 
-This report is about the analysis of Hotel review :
+For Model building we have 1000 review sample data which is classified into Positive and Negative reviews in the dataset.
+
+Out of this 1000 reviews using 800 reviews we have build a model.
+This model will help us to classify the unidentified review into positive or negative.
+
+To check the accuracy of the model we have kept 200 reviews aside on which we can run this pre-build model.
+
+The result of those 200 test reviews is as follow:
+
+
+```{r}
+# Natural Language Processing
+
+# Importing the dataset
+dataset_original = read.delim('Restaurant_Reviews.tsv', quote = '', stringsAsFactors = FALSE)
+
+# Cleaning the texts
+# install.packages('tm')
+# install.packages('SnowballC')
+library(tm)
+library(SnowballC)
+corpus = VCorpus(VectorSource(dataset_original$Review))
+corpus = tm_map(corpus, content_transformer(tolower))
+corpus = tm_map(corpus, removeNumbers)
+corpus = tm_map(corpus, removePunctuation)
+corpus = tm_map(corpus, removeWords, stopwords())
+corpus = tm_map(corpus, stemDocument)
+corpus = tm_map(corpus, stripWhitespace)
+
+# Creating the Bag of Words model
+dtm = DocumentTermMatrix(corpus)
+dtm = removeSparseTerms(dtm, 0.999)
+dataset = as.data.frame(as.matrix(dtm))
+dataset$Liked = dataset_original$Liked
+
+# Importing the dataset
+#dataset = read.csv('Social_Network_Ads.csv')
+#dataset = dataset[3:5]
+
+# Encoding the target feature as factor
+dataset$Liked = factor(dataset$Liked, levels = c(0, 1))
+
+# Splitting the dataset into the Training set and Test set
+# install.packages('caTools')
+library(caTools)
+set.seed(123)
+split = sample.split(dataset$Liked, SplitRatio = 0.8)
+training_set = subset(dataset, split == TRUE)
+test_set = subset(dataset, split == FALSE)
+
+# Fitting Random Forest Classification to the Training set
+# install.packages('randomForest')
+library(randomForest)
+classifier = randomForest(x = training_set[-692],
+                          y = training_set$Liked,
+                          ntree = 10)
+
+# Predicting the Test set results
+y_pred = predict(classifier, newdata = test_set[-692])
+
+# Making the Confusion Matrix
+cm = table(test_set[, 692], y_pred)
+
+cmm=as.matrix(cm)
+colnames(cmm)=c("Pred_Neg","Pred_Pos")
+rownames(cmm)=c("Actual_Neg","Actual_Pos")
+print(cmm)
+
+library(caret)
+print(paste(("Sensitivity of Model:"),paste(trunc((sensitivity(cm)*100)),"%")))
+#print(paste(trunc((sensitivity(cm)*100)),"%"))
+#print("specificity of Model:")
+print(paste(("specificity of Model:"),paste(trunc((specificity(cm)*100)),"%")))
+
+t=confusionMatrix(cm)
+
+print(paste(("Accuracy of Model:"),paste(trunc((t$overall['Accuracy']*100)),"%")))
+
+```
+## Terms used in NLP model 
+## Sensitivity:
+It measures the proportion of actual positives that are correctly identified as such (e.g., the percentage of positive review which are correctly identified as positive).
+
+## Specificity: 
+It measures the proportion of actual negatives that are correctly identified as such (e.g., the percentage of negative review which are correctly identified as negative).
+
+## Accuracy:
+Accuracy is how close you are to the true value(e.g.,How correctly model classified positive and negative reviews).
+
+## Graphical Presentation for Restaurant Review Analysis
+
+Most used words in Restaurant reviews :
 
 ```{r cars, echo=FALSE, message=FALSE, warning=FALSE}
 library("tm")
@@ -92,7 +185,7 @@ wordcloud(words = names(word.freq), freq = word.freq,scale=c(4,.5), min.freq = 5
 
 ```
 
-## Cooccurance of words while talking about Business
+## Cooccurance of words while talking about Restaurant
 
 
 ```{r pressure, echo=FALSE, message=FALSE, warning=FALSE}
@@ -127,7 +220,7 @@ ggraph(wordnetwork, layout = "fr") +
 
 ```
 
-## Most Occurred Nouns and Adjective in Hotel review
+## Most Occurred Nouns and Adjective in Restaurant review
 ```{r}
 i=1
 all_view=""
@@ -161,7 +254,7 @@ stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "People Most commenting(Adjective)", xlab = "Freq")
 ```
 
-## Reviews commenting about service
+## Reviews commenting about Restaurant service
 
 Analysis of the reviews while talking about the service 
 
@@ -283,7 +376,7 @@ barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurrin
 
 ```
 
-## Reviews about Food Analysis
+## Reviews about Restaurant Food Analysis
 
 Analysis of reviews while talking about the Food
 
@@ -405,78 +498,6 @@ stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurring Adjective", xlab = "Freq")
 ```
 
-## Natural Language Processing
-With the data input of 1000 reviews, we have build the model to classify the review into positive or negative.
-If we apply same model to sample 200 reviews we will get following result to validate the model.
-
-
-```{r}
-# Natural Language Processing
-
-# Importing the dataset
-dataset_original = read.delim('Restaurant_Reviews.tsv', quote = '', stringsAsFactors = FALSE)
-
-# Cleaning the texts
-# install.packages('tm')
-# install.packages('SnowballC')
-library(tm)
-library(SnowballC)
-corpus = VCorpus(VectorSource(dataset_original$Review))
-corpus = tm_map(corpus, content_transformer(tolower))
-corpus = tm_map(corpus, removeNumbers)
-corpus = tm_map(corpus, removePunctuation)
-corpus = tm_map(corpus, removeWords, stopwords())
-corpus = tm_map(corpus, stemDocument)
-corpus = tm_map(corpus, stripWhitespace)
-
-# Creating the Bag of Words model
-dtm = DocumentTermMatrix(corpus)
-dtm = removeSparseTerms(dtm, 0.999)
-dataset = as.data.frame(as.matrix(dtm))
-dataset$Liked = dataset_original$Liked
-
-# Importing the dataset
-#dataset = read.csv('Social_Network_Ads.csv')
-#dataset = dataset[3:5]
-
-# Encoding the target feature as factor
-dataset$Liked = factor(dataset$Liked, levels = c(0, 1))
-
-# Splitting the dataset into the Training set and Test set
-# install.packages('caTools')
-library(caTools)
-set.seed(123)
-split = sample.split(dataset$Liked, SplitRatio = 0.8)
-training_set = subset(dataset, split == TRUE)
-test_set = subset(dataset, split == FALSE)
-
-# Fitting Random Forest Classification to the Training set
-# install.packages('randomForest')
-library(randomForest)
-classifier = randomForest(x = training_set[-692],
-                          y = training_set$Liked,
-                          ntree = 10)
-
-# Predicting the Test set results
-y_pred = predict(classifier, newdata = test_set[-692])
-
-# Making the Confusion Matrix
-cm = table(test_set[, 692], y_pred)
-
-print(cm)
-
-library(caret)
-print(paste(("Sensitivity of Model:"),paste(trunc((sensitivity(cm)*100)),"%")))
-#print(paste(trunc((sensitivity(cm)*100)),"%"))
-#print("specificity of Model:")
-print(paste(("specificity of Model:"),paste(trunc((specificity(cm)*100)),"%")))
-
-t=confusionMatrix(cm)
-
-print(paste(("Accuracy of Model:"),paste(trunc((t$overall['Accuracy']*100)),"%")))
-
-```
-
 
 
 
@@ -584,7 +605,7 @@ stats <- subset(x, upos %in% "NOUN")
 stats <- txt_freq(x = stats$lemma)
 
 library(lattice)
-stats$key <- if(factor(stats$key, levels = rev(stats$key))!="staff")
+stats$key <- factor(stats$key, levels = rev(stats$key))
   
 barchart(key ~ freq, data = head(stats[-1,], 20), col = "blue", main = "Most occurring nouns", xlab = "Freq")
 
