@@ -370,9 +370,33 @@ stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurring Adjective", xlab = "Freq")
 
 
-###########################################Food#######################
+###########################################like#######################
+sum_rev=data.frame(Category=NA,flag=NA,Total=NA)
 
 
+lk=data.frame(cbind("like"=like))
+
+pos=0
+i=1
+for(i in 1:nrow(xv)){
+pos=pos+as.numeric(lk[i,1])
+#print(xv$like[i][1])
+#print(i)
+i=i+1
+}
+pos_serv=pos
+neg_serv=nrow(xv)-pos
+#sum_rev=cbind("FOOD","Positive",pos_serv)
+#sum_rev=rbind(c("FOOD","Negative",neg_serv))
+#rn=nrow(sum_rev)
+
+sum_rev[1,1]="SERVICE"
+sum_rev[1,2]="Positive"
+sum_rev[1,3]=pos_serv
+
+sum_rev[2,1]="SERVICE"
+sum_rev[2,2]="Negative"
+sum_rev[2,3]=neg_serv
 
 ```
 
@@ -496,6 +520,36 @@ stats <- txt_freq(x = stats$lemma)
 library(lattice)
 stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurring Adjective", xlab = "Freq")
+
+######################like and dislike 
+
+lk=data.frame(cbind("like"=like))
+
+pos=0
+i=1
+for(i in 1:nrow(xv)){
+pos=pos+as.numeric(lk[i,1])
+#print(xv$like[i][1])
+#print(i)
+i=i+1
+}
+pos_food=pos
+neg_food=nrow(xv)-pos
+rn=nrow(sum_rev)
+
+sum_rev[rn+1,1]="FOOD"
+sum_rev[rn+1,2]="Positive"
+sum_rev[rn+1,3]=pos_serv
+rn=nrow(sum_rev)
+sum_rev[rn+1,1]="FOOD"
+sum_rev[rn+1,2]="Negative"
+sum_rev[rn+1,3]=neg_serv
+
+sum_rev
+
+
+#print(pos_food)
+#print(neg_food)
 ```
 
 
@@ -619,8 +673,49 @@ stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurring Adjective", xlab = "Freq")
 
 
-###########################################Food#######################
+######################like and dislike 
+
+lk=data.frame(cbind("like"=like))
+
+pos=0
+i=1
+for(i in 1:nrow(xv)){
+pos=pos+as.numeric(lk[i,1])
+#print(xv$like[i][1])
+#print(i)
+i=i+1
+}
+pos_staff=pos
+neg_staff=nrow(xv)-pos
+rn=nrow(sum_rev)
+
+sum_rev[rn+1,1]="STAFF"
+sum_rev[rn+1,2]="Positive"
+sum_rev[rn+1,3]=pos_serv
+rn=nrow(sum_rev)
+sum_rev[rn+1,1]="STAFF"
+sum_rev[rn+1,2]="Negative"
+sum_rev[rn+1,3]=neg_serv
+#print(pos_staff)
+#print(neg_staff)
+
+sum_rev
+
+library(ggplot2)
 
 
-
+p <- ggplot(sum_rev, aes(x = Category, y = Total)) +
+     geom_bar(aes(fill = flag), stat="identity",position = "dodge") +
+     geom_text(aes(label = Total), size = 3)
+p
 ```
+
+
+
+## Model Building Requirement
+
+## Language/Tool Used :
+  R & Python
+
+## Dataset Size :
+  Large data size will help to build good model with max. accuracy(More than 2000 reviews will give good picture in this case).

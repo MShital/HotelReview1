@@ -598,8 +598,18 @@ stats$key <- factor(stats$key, levels = rev(stats$key))
 barchart(key ~ freq, data = head(stats, 20), col = "blue", main = "Most occurring Adjective", xlab = "Freq")
 
 
-###########################################Food#######################
+###########################################Food all positive#######################
+lk=data.frame(cbind("like"=like))
 
-
-
+pos=0
+i=1
+for(i in 1:nrow(xv)){
+pos=pos+as.numeric(lk[i,1])
+print(xv$like[i][1])
+print(i)
+i=i+1
+}
+pos_food=pos
+neg_food=nrow(xv)-pos
+neg_food
 ```
