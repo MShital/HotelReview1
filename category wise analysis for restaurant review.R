@@ -76,3 +76,17 @@ class(cat)
 write.csv(cat,file = "test")
 
 head(cat)
+###########################################
+dataset_original
+library(dplyr)
+f=filter(dataset_original,Liked<1)
+head(f)
+?filter
+
+cl_data=read.csv(file.choose())
+f=filter(cl_data,time>0|place>0|sevice>0|food>0|staff>0)
+
+
+
+select(cl_data,)
+?select
